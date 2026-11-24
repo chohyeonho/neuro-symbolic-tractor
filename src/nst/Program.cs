@@ -20,6 +20,6 @@ static class Program
 
     // Every action nst has, each given its adapters.
     static ActionTable Compose() => new([
-        new LinesAction(new FileSystemTextFiles()),
+        new LinesAction(new FileSystemTextFiles(Environment.CurrentDirectory)),
     ]);
 }

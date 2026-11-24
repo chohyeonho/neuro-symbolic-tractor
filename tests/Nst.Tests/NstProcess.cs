@@ -8,11 +8,15 @@ static class NstProcess
 {
     public sealed record Result(int ExitCode, string[] OutLines, string Err);
 
-    public static Result Run(params string[] args)
+    public static Result Run(params string[] args) => RunIn(Environment.CurrentDirectory, args);
+
+    // Runs nst from folder, as a session launched in that project folder would.
+    public static Result RunIn(string folder, params string[] args)
     {
         var nst = Path.Combine(AppContext.BaseDirectory, "nst.dll");
         var psi = new ProcessStartInfo("dotnet")
         {
+            WorkingDirectory = folder,
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,

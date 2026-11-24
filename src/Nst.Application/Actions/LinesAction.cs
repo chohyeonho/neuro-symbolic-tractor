@@ -1,9 +1,11 @@
+using System.Globalization;
 using Nst.Application.Ports;
 using Nst.Domain;
 
 namespace Nst.Application.Actions;
 
 // nst lines <file> <start> [count]: numbered lines of one file from start, at most Lines.MaxLines.
+// Which files may be read is the port's business (the project folder only, for the real file system).
 public sealed class LinesAction(ITextFiles files) : IAction
 {
     public string Name => "lines";
@@ -30,5 +32,13 @@ public sealed class LinesAction(ITextFiles files) : IAction
         }
     }
 
-    static bool TryPositive(string s, out int value) => int.TryParse(s, out value) && value >= 1;
+    // A whole number of 1 or more, written in digits only. A number too large for an int counts as the largest
+    // int, so a huge count still means "as many as allowed" and a huge start lies past the end of the file.
+    static bool TryPositive(string s, out int value)
+    {
+        value = 0;
+        if (s.Length == 0 || !s.All(char.IsAsciiDigit) || s.All(c => c == '0')) return false;
+        if (!int.TryParse(s, NumberStyles.None, CultureInfo.InvariantCulture, out value)) value = int.MaxValue;
+        return true;
+    }
 }
