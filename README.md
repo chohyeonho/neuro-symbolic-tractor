@@ -63,6 +63,20 @@ Slots for what can be swapped:
 - **The session program** (Claude Code today) is not called by nst; it calls nst.
   It is swapped in how sessions are launched, and nst's code does not change.
 
+## Actions
+
+| action | prints | cap |
+|---|---|---|
+| `nst lines <file> <start> [count]` | numbered lines of one file from `start` | 120 lines per call |
+
+## Constitution
+
+Rules nst keeps whatever a session asks. Each is held by the code, proved for a model in Lean, and tested on the real program.
+
+1. One call of `nst lines` prints at most 120 lines of the file.
+   Proved as `selectLines_le_maxLines` in `lean/NstProof.lean` for a model of `Lines.Select` (`src/Nst.Domain`); tested in `tests/Nst.Tests/LinesTests.cs`.
+   Calling `lines` again can still read the rest of a file; the cap is per call.
+
 ## Build
 
 ```sh
