@@ -79,8 +79,7 @@ The roles do not need Orca: a terminal for each session is enough. Orca is only 
 ### Jev
 
 Get a Jev API key from TypeSafe.
-Set it as `JEV_API_KEY` in the environment to run the judged tests locally.
-CI is not given the key, so code from a pull request never holds it before review.
+Set it as `JEV_API_KEY` in the environment to run the judged tests locally, and as the repository secret `JEV_API_KEY` for CI.
 Never write the key into a file in the repository.
 
 ## Checking the setup
