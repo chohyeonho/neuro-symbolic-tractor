@@ -10,12 +10,17 @@ public static class Judges
         return key is null ? null : new JevJudge(key);
     }
 
-    // From JEV_API_KEY (CI uses a repository secret), else ~/.config/typesafe/api_key.
+    // From JEV_API_KEY, else ~/.config/typesafe/api_key. CI sets neither.
     static string? JevKey()
     {
-        var env = Environment.GetEnvironmentVariable("JEV_API_KEY");
-        if (!string.IsNullOrWhiteSpace(env)) return env.Trim();
         var file = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "typesafe", "api_key");
-        return File.Exists(file) ? File.ReadAllText(file).Trim() : null;
+        return KeyFrom(Environment.GetEnvironmentVariable("JEV_API_KEY"), File.Exists(file) ? File.ReadAllText(file) : null);
+    }
+
+    // The variable wins when it holds a key; a blank variable or a blank file counts as no key.
+    public static string? KeyFrom(string? variable, string? fileText)
+    {
+        if (!string.IsNullOrWhiteSpace(variable)) return variable.Trim();
+        return string.IsNullOrWhiteSpace(fileText) ? null : fileText.Trim();
     }
 }

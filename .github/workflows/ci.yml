@@ -24,6 +24,10 @@ jobs:
       - name: build
         run: dotnet build nst.slnx -c Release
       - name: test
+        # No Jev key here: code from a pull request must not hold it before review, so the judged test is skipped.
         run: dotnet test --project tests/Nst.Tests -c Release
-        env:
-          JEV_API_KEY: ${{ secrets.JEV_API_KEY }}
+      - name: publish
+        # The README's install step, so a reader who follows it gets a working native program.
+        run: |
+          dotnet publish src/nst -c Release -o out/nst
+          out/nst/nst

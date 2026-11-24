@@ -70,6 +70,16 @@ dotnet test --project tests/Nst.Tests -c Release   # runtime checks of the real 
 cd lean && lake build                             # the proofs (Lean 4, version pinned in lean/lean-toolchain)
 ```
 
+## Install
+
+```sh
+dotnet publish src/nst -c Release -o out/nst      # one native program: out/nst/nst.exe on Windows, out/nst/nst elsewhere
+```
+
+Put the `out/nst` folder on the `PATH` of the session that rides nst, then launch the session as the
+[environment](docs/setup/environment.md) shows. Running `nst` from any project folder then prints its actions.
+On Windows, publishing also needs the Visual Studio C++ build tools (see the environment).
+
 ## Verification
 
 Three tools check nst, each where the others cannot reach.

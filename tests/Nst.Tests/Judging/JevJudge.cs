@@ -5,8 +5,9 @@ using System.Text.Json.Nodes;
 namespace Nst.Tests.Judging;
 
 // Jev (TypeSafe System One), the pinned judge. Its version is pinned in Model; see the README's reference environment.
-// The key is given by the caller and is never printed.
-public sealed class JevJudge(string key) : IJudge
+// The key is given by the caller and is never printed, and neither is anything Jev sends back on a failure,
+// since a reply could echo the request.
+public sealed class JevJudge(string key, HttpMessageHandler? handler = null) : IJudge
 {
     const string Url = "https://api.typesafe.ai/v1/systemone";
 
@@ -19,16 +20,17 @@ public sealed class JevJudge(string key) : IJudge
             q[name] = new JsonObject { ["type"] = "noul", ["instructions"] = instruction };
         var body = new JsonObject { ["model"] = Model, ["state"] = text, ["questions"] = q };
 
-        using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+        using var http = handler is null ? new HttpClient() : new HttpClient(handler, disposeHandler: false);
+        http.Timeout = TimeSpan.FromSeconds(30);
         using var req = new HttpRequestMessage(HttpMethod.Post, Url)
         {
             Content = new StringContent(body.ToJsonString(), Encoding.UTF8, "application/json"),
         };
         req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
         using var resp = await http.SendAsync(req);
-        var reply = await resp.Content.ReadAsStringAsync();
         if (!resp.IsSuccessStatusCode)
-            throw new HttpRequestException($"Jev answered {(int)resp.StatusCode}: {reply[..Math.Min(reply.Length, 300)]}");
+            throw new HttpRequestException($"Jev answered {(int)resp.StatusCode}. The reply is not shown.");
+        var reply = await resp.Content.ReadAsStringAsync();
 
         var answers = JsonNode.Parse(reply)?["answers"]?.AsObject()
             ?? throw new InvalidDataException("Jev's reply has no answers.");
