@@ -10,7 +10,7 @@ public static class Judges
         return key is null ? null : new JevJudge(key);
     }
 
-    // From JEV_API_KEY, else ~/.config/typesafe/api_key. CI sets neither.
+    // From JEV_API_KEY, else ~/.config/typesafe/api_key. CI sets JEV_API_KEY from the repository secret.
     static string? JevKey()
     {
         var file = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "typesafe", "api_key");
