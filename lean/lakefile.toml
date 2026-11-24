@@ -1,0 +1,5 @@
+name = "nstproof"
+defaultTargets = ["NstProof"]
+
+[[lean_lib]]
+name = "NstProof"
