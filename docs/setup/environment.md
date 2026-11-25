@@ -43,6 +43,12 @@ Install Claude Code 2.1.331 with the native installer, naming the version so the
 | macOS, Linux, WSL | `curl -fsSL https://claude.ai/install.sh \| bash -s 2.1.331` |
 | Windows PowerShell | `& ([scriptblock]::Create((irm https://claude.ai/install.ps1))) 2.1.331` |
 
+Native installs update themselves in the background, and a later Claude Code can change the permission behavior this guide relies on.
+The consumer settings file sets `DISABLE_AUTOUPDATER` to `1`, so a consumer session does not update the install.
+The install is shared, so set the same `env` entry in `~/.claude/settings.json` for every other session on the machine.
+`claude --version` shows the version in use.
+To move to a later version, raise the pin as the top of this document says, and repeat the restriction check below on the new version first.
+
 On native Windows, also install [Git for Windows](https://git-scm.com/downloads/win).
 The consumer launch below keeps only the Bash tool, and Claude Code needs Git Bash to provide it.
 
@@ -58,8 +64,11 @@ claude --restricted --tools Bash --settings "<path to consumer-settings.json>" -
   The settings file named with `--settings` applies, and so do managed settings, which an organization's administrator sets for the machine.
   This guide assumes a machine with no managed settings. Managed rules that allow more commands would also apply to the consumer.
 - `--tools Bash` leaves the shell as the only built-in tool.
-- The consumer settings file allows `nst` and `nst *` and nothing else.
-  It also denies the file tools and the commands Claude Code would let through without asking because it treats them as read-only.
+- The consumer settings file allows `nst` and `nst *` and denies the file tools.
+  Claude Code still runs a built-in set of read-only commands, such as `pwd` and `echo`, without any allow rule, and that set is not listed in full.
+  So the file also runs a check before every Bash call that refuses the call unless it is `nst` followed by plain arguments:
+  no quotes, no shell operators such as `&&`, `;`, `|` or `>`, and no `$`, `~` or globs.
+  If the check cannot run, the call is refused too (`onFailure: block`).
   Use [consumer-settings.json](consumer-settings.json), the file this setup was checked with.
 - `--permission-mode dontAsk` denies anything that is not allowed, without asking.
 - `--strict-mcp-config` and `--disable-slash-commands` keep MCP servers and skills out.
@@ -67,8 +76,9 @@ claude --restricted --tools Bash --settings "<path to consumer-settings.json>" -
 
 The settings file belongs to whoever launches the session. nst does not read it.
 
-After launching, check the restriction once: ask the session to run `nst` and then `cat README.md`.
-`nst` runs, and `cat` is denied.
+After launching, check the restriction once: ask the session to run `nst`, then `pwd`, `echo hi`, `ls`, `cat README.md`, `git status` and `nst && ls`, one call each.
+`nst` runs, and every other call is refused with "Only nst may run in this session."
+This setup was checked that way with Claude Code 2.1.331 on Windows.
 
 ### Orca
 
@@ -91,4 +101,4 @@ Never write the key into a file in the repository.
 | `dotnet --version` (at the repository root) | `10.0.403` or a later `10.0` SDK |
 | `lake --version` (in `lean/`) | Lean version `4.36.0` |
 
-Sources: [Claude Code CLI](https://code.claude.com/docs/en/cli-reference), [Claude Code permissions](https://code.claude.com/docs/en/permissions), [global.json](https://learn.microsoft.com/en-us/dotnet/core/tools/global-json), [Native AOT](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/), [elan](https://github.com/leanprover/elan), [Claude Code setup](https://code.claude.com/docs/en/setup), [Orca CLI](https://orca.dev/docs/cli/overview), [.NET 10.0.14 release notes](https://github.com/dotnet/core/blob/main/release-notes/10.0/10.0.14/10.0.14.md), [Jev API](https://docs.typesafe.ai/api/system-one), [Jev models](https://docs.typesafe.ai/models).
+Sources: [Claude Code CLI](https://code.claude.com/docs/en/cli-reference), [Claude Code permissions](https://code.claude.com/docs/en/permissions), [Claude Code read-only commands](https://code.claude.com/docs/en/permissions#read-only-commands), [Claude Code hooks](https://code.claude.com/docs/en/hooks), [global.json](https://learn.microsoft.com/en-us/dotnet/core/tools/global-json), [Native AOT](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/), [elan](https://github.com/leanprover/elan), [Claude Code setup](https://code.claude.com/docs/en/setup), [Orca CLI](https://orca.dev/docs/cli/overview), [.NET 10.0.14 release notes](https://github.com/dotnet/core/blob/main/release-notes/10.0/10.0.14/10.0.14.md), [Jev API](https://docs.typesafe.ai/api/system-one), [Jev models](https://docs.typesafe.ai/models).
