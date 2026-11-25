@@ -67,8 +67,13 @@ Slots for what can be swapped:
 ```sh
 dotnet build nst.slnx -c Release                   # every project
 dotnet test --project tests/Nst.Tests -c Release   # runtime checks of the real program
-cd lean && lake build                             # the proofs (Lean 4, version pinned in lean/lean-toolchain)
+cd lean
+lake build                                        # the proofs (Lean 4, version pinned in lean/lean-toolchain)
+cd ..
 ```
+
+Each command is on its own line, so the block runs the same in Windows PowerShell, which has no `&&`,
+and the last line brings you back to the repository root, where the commands below run.
 
 ## Install
 
@@ -78,7 +83,15 @@ dotnet publish src/nst -c Release -o out/nst      # one native program: out/nst/
 
 Put the `out/nst` folder on the `PATH` of the session that rides nst, then launch the session as the
 [environment](docs/setup/environment.md) shows. Running `nst` from any project folder then prints its actions.
-On Windows, publishing also needs the Visual Studio C++ build tools (see the environment).
+Publishing to one native program needs a native compiler toolchain besides the .NET SDK
+([Native AOT prerequisites](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/#prerequisites)):
+
+| Platform | Also install |
+| --- | --- |
+| Windows | the Visual Studio C++ build tools, with the Installer folder on `PATH` (see the [environment](docs/setup/environment.md)) |
+| Ubuntu | `sudo apt-get install clang` |
+| Fedora, RHEL | `sudo dnf install clang` |
+| macOS | the latest Command Line Tools for Xcode (`xcode-select --install`) |
 
 ## Verification
 
