@@ -12,7 +12,7 @@ When a pinned version is raised, change this document, the README table and the 
 | Claude Code | the CLI that runs each AI session | 2.1.331 | this document |
 | Orca | opens and keeps the terminals the sessions run in | 1.4.248 | this document |
 | Jev | the outside judge model the tests call | `jev-1.14.0` | this document; the judge sends it as its model |
-| .NET | builds and runs nst | SDK 10.0.403 or a later 10.0 SDK | `global.json` |
+| .NET | builds and runs nst | SDK 10.0.404 or a later 10.0 SDK | `global.json` |
 | Lean | checks the proofs | 4.36.0 | `lean/lean-toolchain` |
 
 Lean and C# are fixed for good: they do not differ from one person to the next.
@@ -22,8 +22,11 @@ The others can differ from one person or project to the next, so nst gives each 
 
 ### .NET
 
-Install the .NET 10 SDK. `global.json` asks for 10.0.403 and lets a later 10.0 SDK stand in for it.
-10.0.403 is the first SDK of its line whose Native AOT compiler carries the October 2026 security fixes, so earlier SDKs are refused.
+Install the .NET 10 SDK. `global.json` asks for 10.0.404 and lets a later 10.0 SDK stand in for it.
+10.0.404 is the SDK of .NET 10.0.15 (November 2026), whose fixes include ones to the .NET runtime itself
+(CVE-2026-109475, denial of service; CVE-2026-105544, elevation of privilege).
+A native program carries the runtime inside it, so earlier SDKs are refused.
+Take each later patch release as it comes out, and raise the pin with it.
 
 nst is published as one native program. On Windows, `dotnet publish` also needs the Visual Studio C++ build tools
 (the "Desktop development with C++" workload), and the Visual Studio Installer folder on `PATH` so the build can find them.
@@ -68,6 +71,9 @@ claude --restricted --tools Bash --settings "<path to consumer-settings.json>" -
   Claude Code still runs a built-in set of read-only commands, such as `pwd` and `echo`, without any allow rule, and that set is not listed in full.
   So the file also runs a check before every Bash call that refuses the call unless it is `nst` followed by plain arguments:
   no quotes, no shell operators such as `&&`, `;`, `|` or `>`, and no `$`, `~` or globs.
+  An argument also cannot hold a space, `(`, `)`, `[`, `]`, `{`, `}`, `\`, `!` or `#`,
+  so the consumer cannot name a file whose name holds any of these characters,
+  such as `[id].tsx`, `app/(auth)/page.tsx` or a name with a space. Separate folders with `/`.
   If the check cannot run, the call is refused too (`onFailure: block`).
   Use [consumer-settings.json](consumer-settings.json), the file this setup was checked with.
 - `--permission-mode dontAsk` denies anything that is not allowed, without asking.
@@ -98,7 +104,7 @@ Never write the key into a file in the repository.
 | --- | --- |
 | `claude --version` | `2.1.331 (Claude Code)` |
 | `orca --version` | `1.4.248` |
-| `dotnet --version` (at the repository root) | `10.0.403` or a later `10.0` SDK |
+| `dotnet --version` (at the repository root) | `10.0.404` or a later `10.0` SDK |
 | `lake --version` (in `lean/`) | Lean version `4.36.0` |
 
-Sources: [Claude Code CLI](https://code.claude.com/docs/en/cli-reference), [Claude Code permissions](https://code.claude.com/docs/en/permissions), [Claude Code read-only commands](https://code.claude.com/docs/en/permissions#read-only-commands), [Claude Code hooks](https://code.claude.com/docs/en/hooks), [global.json](https://learn.microsoft.com/en-us/dotnet/core/tools/global-json), [Native AOT](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/), [elan](https://github.com/leanprover/elan), [Claude Code setup](https://code.claude.com/docs/en/setup), [Orca CLI](https://orca.dev/docs/cli/overview), [.NET 10.0.14 release notes](https://github.com/dotnet/core/blob/main/release-notes/10.0/10.0.14/10.0.14.md), [Jev API](https://docs.typesafe.ai/api/system-one), [Jev models](https://docs.typesafe.ai/models).
+Sources: [Claude Code CLI](https://code.claude.com/docs/en/cli-reference), [Claude Code permissions](https://code.claude.com/docs/en/permissions), [Claude Code read-only commands](https://code.claude.com/docs/en/permissions#read-only-commands), [Claude Code hooks](https://code.claude.com/docs/en/hooks), [global.json](https://learn.microsoft.com/en-us/dotnet/core/tools/global-json), [Native AOT](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/), [elan](https://github.com/leanprover/elan), [Claude Code setup](https://code.claude.com/docs/en/setup), [Orca CLI](https://orca.dev/docs/cli/overview), [.NET 10.0.15 release notes](https://github.com/dotnet/core/blob/main/release-notes/10.0/10.0.15/10.0.15.md), [Jev API](https://docs.typesafe.ai/api/system-one), [Jev models](https://docs.typesafe.ai/models).
