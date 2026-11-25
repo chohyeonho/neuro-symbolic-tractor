@@ -32,3 +32,12 @@ jobs:
         run: |
           dotnet publish src/nst -c Release -o out/nst
           out/nst/nst
+      - name: native lines
+        # The consumer rides the native program, so the cap is checked on it too, not only on the managed build.
+        run: |
+          mkdir -p "$RUNNER_TEMP/project"
+          seq 1 300 > "$RUNNER_TEMP/project/many.txt"
+          NST_ROOT="$RUNNER_TEMP/project" out/nst/nst lines many.txt 1 300 > printed.txt
+          test "$(wc -l < printed.txt)" -eq 120
+          test "$(head -n 1 printed.txt)" = "1: 1"
+          test "$(tail -n 1 printed.txt)" = "120: 120"

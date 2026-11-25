@@ -2,6 +2,8 @@
 // Composition root: the only place that knows which adapter fills which port.
 using System.Text;
 using Nst.Application;
+using Nst.Application.Actions;
+using Nst.Infrastructure;
 
 namespace Nst;
 
@@ -16,6 +18,10 @@ static class Program
         return result.ExitCode;
     }
 
-    // Every action nst has, each given its adapters. The base has none yet.
-    static ActionTable Compose() => new([]);
+    // Every action nst has, each given its adapters.
+    // The project folder comes from NST_ROOT, which whoever launches the session sets. It is not the folder a call
+    // runs from: a session can run nst from anywhere, but it cannot change what the launcher set.
+    static ActionTable Compose() => new([
+        new LinesAction(new FileSystemTextFiles(Environment.GetEnvironmentVariable("NST_ROOT"))),
+    ]);
 }

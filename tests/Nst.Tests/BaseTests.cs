@@ -8,11 +8,11 @@ namespace Nst.Tests;
 public class BaseTests
 {
     [Fact]
-    public void Nst_runs_with_no_arguments()
+    public void Nst_lists_its_actions_with_no_arguments()
     {
         var r = NstProcess.Run();
         Assert.Equal(0, r.ExitCode);
-        Assert.Equal([ActionTable.Header + " No actions yet."], r.OutLines);
+        Assert.Equal(ActionTable.Header, r.OutLines[0]);
     }
 
     [Fact]
