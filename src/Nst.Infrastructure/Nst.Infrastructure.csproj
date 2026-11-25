@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Infrastructure: adapters that implement Application's ports with real files and programs.
+       Each pinned outside program (see the README's reference environment) gets its adapter here,
+       so swapping that program later touches this layer only. -->
+  <PropertyGroup>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Nst.Application/Nst.Application.csproj" />
+  </ItemGroup>
+</Project>

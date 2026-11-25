@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Application: nst's actions and the ports they reach the outside through.
+       Depends on Domain only. Outside programs are reached through interfaces declared here
+       and implemented in Infrastructure. -->
+  <PropertyGroup>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Nst.Domain/Nst.Domain.csproj" />
+  </ItemGroup>
+</Project>

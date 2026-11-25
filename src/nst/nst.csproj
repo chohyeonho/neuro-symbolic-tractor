@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- nst: the one program an AI session may run. This project is the composition root and the console:
+       it builds every action with its adapters, runs the one a call names, and prints the result.
+       Native AOT so each call starts at once, without loading a runtime first. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>nst</AssemblyName>
+    <RootNamespace>Nst</RootNamespace>
+    <PublishAot>true</PublishAot>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Nst.Application/Nst.Application.csproj" />
+    <ProjectReference Include="../Nst.Infrastructure/Nst.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
