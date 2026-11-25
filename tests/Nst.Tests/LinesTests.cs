@@ -4,7 +4,7 @@ using Nst.Infrastructure;
 
 namespace Nst.Tests;
 
-// nst lines on the real program, run from a project folder made for each test.
+// nst lines on the built program (nst.dll) as a process, run from a project folder made for each test.
 // Rule 1: one call prints at most 120 lines of the file. These checks run the C# program; the Lean proof
 // checks its model on its own, so the two are independent and neither reads the other.
 public sealed class LinesTests : IDisposable
@@ -152,13 +152,25 @@ public sealed class LinesTests : IDisposable
         AssertRefusedOutside(NstProcess.RunIn(project, "lines", Path.Combine("escape", "api_key"), "1"));
     }
 
-    [Fact]
-    public void Lines_refuses_a_windows_device_at_once()
+    // A device name is refused by a check on the name, before anything is opened: one that the system maps to
+    // \\.\ (NUL, and on Windows before 11 the others too) is outside the folder; one it leaves as a plain name
+    // inside the folder is not found.
+    [Theory]
+    [InlineData("CON")]
+    [InlineData("CONIN$")]
+    [InlineData("COM1")]
+    [InlineData("NUL")]
+    public void Lines_refuses_a_windows_device_name_at_once(string name)
     {
         Assert.SkipUnless(OperatingSystem.IsWindows(), "Device names exist only on Windows.");
+        var refusal = Path.GetFullPath(Path.Combine(project, name)).StartsWith(@"\\.\", StringComparison.Ordinal)
+            ? "is outside the project folder"
+            : "was not found";
         var watch = Stopwatch.StartNew();
-        var r = NstProcess.RunIn(project, "lines", "CON", "1");
+        var r = NstProcess.RunIn(project, "lines", name, "1");
         Assert.Equal(1, r.ExitCode);
+        Assert.Empty(r.OutLines);
+        Assert.Contains($"{name} {refusal}", r.Err);
         Assert.True(watch.Elapsed < TimeSpan.FromSeconds(10), $"took {watch.Elapsed}");
     }
 
@@ -201,6 +213,16 @@ public sealed class LinesTests : IDisposable
         Assert.Equal(1, r.ExitCode);
         Assert.Empty(r.OutLines);
         Assert.Contains("No project folder was given", r.Err);
+    }
+
+    [Fact]
+    public void Lines_refuses_a_project_folder_that_is_not_a_full_path()
+    {
+        Lines("a.txt", 3);
+        var r = NstProcess.RunWith(".", project, "lines", "a.txt", "1");
+        Assert.Equal(1, r.ExitCode);
+        Assert.Empty(r.OutLines);
+        Assert.Contains("The project folder must be a full path", r.Err);
     }
 
     [Fact]

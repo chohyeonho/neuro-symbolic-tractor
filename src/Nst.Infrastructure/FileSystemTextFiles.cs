@@ -20,6 +20,9 @@ public sealed class FileSystemTextFiles(string? projectFolder) : ITextFiles
     {
         if (string.IsNullOrWhiteSpace(projectFolder))
             throw new IOException("No project folder was given to read from.");
+        // A relative folder would be taken from wherever each call runs, which is what NST_ROOT is there to stop.
+        if (!Path.IsPathFullyQualified(projectFolder))
+            throw new IOException($"The project folder must be a full path, not \"{projectFolder}\".");
         return (RealPath(projectFolder), OpenedFile.FinalPathOfFolder(projectFolder));
     });
 
@@ -63,9 +66,11 @@ public sealed class FileSystemTextFiles(string? projectFolder) : ITextFiles
     static bool Inside(string root, string real, StringComparison comparison) =>
         real.StartsWith(root.EndsWith(Path.DirectorySeparatorChar) ? root : root + Path.DirectorySeparatorChar, comparison);
 
-    // A file that is not a folder, a device or a link. Windows names devices and pipes outside
-    // any folder (\\.\), so the folder check already refuses them. The open checks the kind again on the
-    // handle, which also catches what these attributes cannot tell apart, such as a POSIX FIFO.
+    // A file that is not a folder, a device or a link. Windows device names never get this far. NUL becomes
+    // \\.\NUL, outside any folder, so the folder check refuses it. Since Windows 11, CON, CONIN$, COM1 and the like
+    // inside a folder are plain names that no file has, so the check that the file exists refuses them.
+    // The open checks the kind again on the handle. On Linux that is what refuses a POSIX FIFO; on Windows no name
+    // inside a folder is known to reach it, so it stays as a second guard that no test covers there.
     static bool IsRegularFile(string real)
     {
         if (!File.Exists(real)) return false;

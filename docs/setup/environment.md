@@ -80,7 +80,7 @@ A session that rides nst (the consumer) is launched like this:
 - `--permission-mode dontAsk` denies anything that is not allowed, without asking.
 - `--strict-mcp-config` and `--disable-slash-commands` keep MCP servers and skills out.
 - `nst` must be on the session's `PATH`.
-- `NST_ROOT` names the project folder `nst lines` may read. nst does not use the folder a call runs from,
+- `NST_ROOT` names the project folder `nst lines` may read, as a full path; nst refuses a relative one. nst does not use the folder a call runs from,
   and the check above lets no call set a variable, so the session cannot widen what nst reads. Without it, `nst lines` refuses to read.
 - `JEV_API_KEY` is removed: only the tests need the key, and the consumer never holds it.
 

@@ -73,10 +73,10 @@ Slots for what can be swapped:
 
 ## Constitution
 
-Rules nst keeps whatever a session asks. Each is held by the code, proved for a model in Lean, and tested on the real program.
+Rules nst keeps whatever a session asks. Each is held by the code, proved for a model in Lean, and tested on the program run as a process.
 
 1. One call of `nst lines` prints at most 120 lines of the file.
-   Proved as `selectLines_le_120` in `lean/NstProof.lean`, which states the bound as the number 120, for a model of `Lines.Select` (`src/Nst.Domain`); tested in `tests/Nst.Tests/LinesTests.cs`.
+   Proved as `selectLines_le_120` in `lean/NstProof.lean`, which states the bound as the number 120, for a model of `Lines.Select` (`src/Nst.Domain`); tested in `tests/Nst.Tests/LinesTests.cs` on the managed build, and in CI with one `nst lines` call on the native program.
    Calling `lines` again can still read the rest of a file; the cap is per call.
    The proof and the tests are independent checks: the tests run the C# program, and neither reads the other's result.
 
@@ -118,7 +118,7 @@ Three tools check nst, each where the others cannot reach.
 - **Lean** proves a rule on a model of the code that keeps it (`lean/`).
 - **Runtime tests** run nst as a process and hold it to the same rule (`tests/Nst.Tests`).
   They run the managed build that `dotnet build` makes. The consumer rides the native program that `dotnet publish` makes,
-  so CI also publishes that program and runs it.
+  so CI also publishes that program and runs `nst lines` with it.
   They also run layers in process and check the layer directions.
 - **A judge** (Jev, a paid outside model) judges what code cannot decide. It only gives a signal; a test decides.
   Its key comes from `JEV_API_KEY` (in CI, a repository secret) and is never printed. Without a key its tests are skipped.
