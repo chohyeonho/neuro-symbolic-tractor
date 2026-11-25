@@ -67,14 +67,16 @@ Slots for what can be swapped:
 
 | action | prints | cap |
 |---|---|---|
-| `nst lines <file> <start> [count]` | numbered lines of one regular file inside the folder nst runs from, from `start` | 120 lines per call |
+| `nst lines <file> <start> [count]` | numbered lines of one regular file inside the project folder the launcher set (`NST_ROOT`), from `start` | 120 lines per call |
+
+`nst lines` reads files on Windows and Linux; on other systems it refuses.
 
 ## Constitution
 
 Rules nst keeps whatever a session asks. Each is held by the code, proved for a model in Lean, and tested on the real program.
 
 1. One call of `nst lines` prints at most 120 lines of the file.
-   Proved as `selectLines_le_maxLines` in `lean/NstProof.lean` for a model of `Lines.Select` (`src/Nst.Domain`); tested in `tests/Nst.Tests/LinesTests.cs`.
+   Proved as `selectLines_le_120` in `lean/NstProof.lean`, which states the bound as the number 120, for a model of `Lines.Select` (`src/Nst.Domain`); tested in `tests/Nst.Tests/LinesTests.cs`.
    Calling `lines` again can still read the rest of a file; the cap is per call.
    The proof and the tests are independent checks: the tests run the C# program, and neither reads the other's result.
 

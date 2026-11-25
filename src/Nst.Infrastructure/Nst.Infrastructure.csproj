@@ -4,8 +4,11 @@
        so swapping that program later touches this layer only. -->
   <PropertyGroup>
     <IsAotCompatible>true</IsAotCompatible>
+    <!-- The source-generated calls into the system (OpenedFile) need it. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Nst.Application/Nst.Application.csproj" />
+    <InternalsVisibleTo Include="Nst.Tests" />
   </ItemGroup>
 </Project>

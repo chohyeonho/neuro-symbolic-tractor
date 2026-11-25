@@ -18,4 +18,10 @@ theorem selectLines_le_maxLines (fileLines : List String) (start0 count : Nat) :
   unfold selectLines
   exact Nat.le_trans (List.length_take_le _ _) (Nat.min_le_right _ _)
 
+/-- The rule's own number. The bound is written as 120 here, not as `maxLines`, so changing the
+constant alone breaks this proof instead of moving the bound with it. -/
+theorem selectLines_le_120 (fileLines : List String) (start0 count : Nat) :
+    (selectLines fileLines start0 count).length ≤ 120 :=
+  selectLines_le_maxLines fileLines start0 count
+
 end NstProof

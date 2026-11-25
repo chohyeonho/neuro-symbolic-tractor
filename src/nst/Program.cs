@@ -19,7 +19,9 @@ static class Program
     }
 
     // Every action nst has, each given its adapters.
+    // The project folder comes from NST_ROOT, which whoever launches the session sets. It is not the folder a call
+    // runs from: a session can run nst from anywhere, but it cannot change what the launcher set.
     static ActionTable Compose() => new([
-        new LinesAction(new FileSystemTextFiles(Environment.CurrentDirectory)),
+        new LinesAction(new FileSystemTextFiles(Environment.GetEnvironmentVariable("NST_ROOT"))),
     ]);
 }

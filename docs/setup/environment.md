@@ -59,9 +59,10 @@ What a session is told to do lives in the global `CLAUDE.md` (`~/.claude/CLAUDE.
 
 A session that rides nst (the consumer) is launched like this:
 
-```
-claude --restricted --tools Bash --settings "<path to consumer-settings.json>" --permission-mode dontAsk --strict-mcp-config --disable-slash-commands
-```
+| Shell | Launch |
+| --- | --- |
+| macOS, Linux, WSL | `env -u JEV_API_KEY NST_ROOT="<project folder>" claude --restricted --tools Bash --settings "<path to consumer-settings.json>" --permission-mode dontAsk --strict-mcp-config --disable-slash-commands` |
+| Windows PowerShell | `Remove-Item Env:JEV_API_KEY -ErrorAction Ignore; $env:NST_ROOT = "<project folder>"; claude --restricted --tools Bash --settings "<path to consumer-settings.json>" --permission-mode dontAsk --strict-mcp-config --disable-slash-commands` |
 
 - `--restricted` ignores the user, project and local settings files, so permissions given elsewhere do not leak in.
   The settings file named with `--settings` applies, and so do managed settings, which an organization's administrator sets for the machine.
@@ -79,8 +80,16 @@ claude --restricted --tools Bash --settings "<path to consumer-settings.json>" -
 - `--permission-mode dontAsk` denies anything that is not allowed, without asking.
 - `--strict-mcp-config` and `--disable-slash-commands` keep MCP servers and skills out.
 - `nst` must be on the session's `PATH`.
+- `NST_ROOT` names the project folder `nst lines` may read. nst does not use the folder a call runs from,
+  and the check above lets no call set a variable, so the session cannot widen what nst reads. Without it, `nst lines` refuses to read.
+- `JEV_API_KEY` is removed: only the tests need the key, and the consumer never holds it.
 
 The settings file belongs to whoever launches the session. nst does not read it.
+
+What this holds: the session can run only nst, and nst reads only regular files inside `NST_ROOT`,
+checked on the opened file itself. What it does not: the session runs as the operating-system user who launched it,
+so the operating system does not stop that user's programs from reading the user's credentials.
+To confine the session at that level too, launch it as a separate user who cannot read them.
 
 After launching, check the restriction once: ask the session to run `nst`, then `pwd`, `echo hi`, `ls`, `cat README.md`, `git status` and `nst && ls`, one call each.
 `nst` runs, and every other call is refused with "Only nst may run in this session."
