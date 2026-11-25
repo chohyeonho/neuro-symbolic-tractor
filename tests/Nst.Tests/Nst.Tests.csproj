@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <!-- Runtime checks of nst. Process tests run the built nst the way a session calls it; layer tests run
        Application in process; architecture tests read the built assemblies. Lean proves rules on a model;
-       these tests hold the real program to the same rules. The judge slot (Judging/) lives here, not in nst. -->
+       these tests hold the built program to the same rules. The judge slot (Judging/) lives here, not in nst. -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>

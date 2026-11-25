@@ -13,7 +13,8 @@ nst knows two roles.
 An AI session doing a project's work. nst is the tractor it rides: everything it does goes through the tractor,
 and nst is the only program the session can run.
 How it is held to nst is up to whoever launches it; nst does not know.
-Like a brain's working memory, its context holds only so much at once, so every nst action caps what it prints.
+Like a brain's working memory, its context holds only so much at once, so every nst action caps the number of lines it prints per call.
+A line's length is not capped: a file of one very long line comes out whole.
 
 ### Producer: builds the machine
 
@@ -66,7 +67,7 @@ Slots for what can be swapped:
 
 ```sh
 dotnet build nst.slnx -c Release                   # every project
-dotnet test --project tests/Nst.Tests -c Release   # runtime checks of the real program
+dotnet test --project tests/Nst.Tests -c Release   # runtime checks: runs the built nst (nst.dll) as a process
 cd lean
 lake build                                        # the proofs (Lean 4, version pinned in lean/lean-toolchain)
 cd ..
@@ -98,7 +99,9 @@ Publishing to one native program needs a native compiler toolchain besides the .
 Three tools check nst, each where the others cannot reach.
 
 - **Lean** proves a rule on a model of the code that keeps it (`lean/`).
-- **Runtime tests** run the real nst as a process and hold it to the same rule (`tests/Nst.Tests`).
+- **Runtime tests** run nst as a process and hold it to the same rule (`tests/Nst.Tests`).
+  They run the managed build that `dotnet build` makes. The consumer rides the native program that `dotnet publish` makes,
+  so CI also publishes that program and runs it.
   They also run layers in process and check the layer directions.
 - **A judge** (Jev, a paid outside model) judges what code cannot decide. It only gives a signal; a test decides.
   Its key comes from `JEV_API_KEY` (in CI, a repository secret) and is never printed. Without a key its tests are skipped.
