@@ -1,0 +1,38 @@
+{
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
+  },
+  "permissions": {
+    "defaultMode": "dontAsk",
+    "allow": [
+      "Bash(nst)",
+      "Bash(nst *)"
+    ],
+    "deny": [
+      "PowerShell",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "NotebookEdit",
+      "WebFetch",
+      "WebSearch"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "onFailure": "block",
+            "command": "tr -d '\\r\\n' | grep -Eq '[{,][[:space:]]*\"command\"[[:space:]]*:[[:space:]]*\"nst([[:space:]]+[^]['\\''\"\\\\$`;&|<>(){}*?!~#[:space:]]+)*[[:space:]]*\"' || { echo 'Only nst may run in this session.' >&2; exit 2; }"
+          }
+        ]
+      }
+    ]
+  }
+}
